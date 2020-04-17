@@ -33,6 +33,6 @@ public class TaskFIFO implements Runnable{
             }
         }
         // return results
-        pageFaults[maxMemoryFrames-1] = faults;
+        pageFaults[maxMemoryFrames] = faults;
     }
 }

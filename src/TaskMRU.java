@@ -19,6 +19,8 @@ public class TaskMRU implements Runnable {
         int faults = 0;
         // work through sequence
         for(int index=0; index<sequence.length; index++) {
+            //printMemory();
+
             Integer pageRequested = sequence[index];
 
             // if number is in memory go to next
@@ -32,6 +34,12 @@ public class TaskMRU implements Runnable {
             }
         }
         // return results
-        pageFaults[maxMemoryFrames-1] = faults;
+        pageFaults[maxMemoryFrames] = faults;
+    }
+
+    private void printMemory(){
+        System.out.print("Memory ");
+        for(int item: memory) System.out.print(item+", ");
+        System.out.println();
     }
 }
