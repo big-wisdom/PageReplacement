@@ -14,6 +14,12 @@ class PageReplacement {
         int LRUwins = 0;
         int MRUwins = 0;
 
+        // Arrays for results
+        ArrayList<int[]> FIFOresults = new ArrayList<>();
+        ArrayList<int[]> LRUresults = new ArrayList<>();
+        ArrayList<int[]> MRUresults = new ArrayList<>();
+
+        // Create arrays for beladys anomalies
         ArrayList<BeladyAnomaly> FIFObelady = new ArrayList<>();
         ArrayList<BeladyAnomaly> LRUbelady = new ArrayList<>();
         ArrayList<BeladyAnomaly> MRUbelady = new ArrayList<>();
@@ -38,40 +44,40 @@ class PageReplacement {
                 threadPool.execute(new TaskMRU(sequence, frames, 250, MRUresult));
             }
 
-            threadPool.shutdown();
-            try{
-                threadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
-            } catch (Exception e){
+            // Add results
+            FIFOresults.add(FIFOresult);
+            LRUresults.add(LRUresult);
+            MRUresults.add(MRUresult);
+
+        }
+
+        for(int round=0; round<100; round++){
+            // Establish the minimum
+            int min = 1001;
+            if(FIFOresult[round] < min ) min = FIFOresult[round];
+            if(LRUresult[round] < min ) min = LRUresult[round];
+            if(MRUresult[round] < min ) min = MRUresult[round];
+
+            // add a win for all winners
+            String winner = "";
+            if(FIFOresult[round] == min ) {
+                FIFOwins++;
+                winner += "FIFO";
             }
-
-            for(int round=0; round<100; round++){
-                // Establish the minimum
-                int min = 1001;
-                if(FIFOresult[round] < min ) min = FIFOresult[round];
-                if(LRUresult[round] < min ) min = LRUresult[round];
-                if(MRUresult[round] < min ) min = MRUresult[round];
-
-                // add a win for all winners
-                String winner = "";
-                if(FIFOresult[round] == min ) {
-                    FIFOwins++;
-                    winner += "FIFO";
-                }
-                if(LRUresult[round] == min ) {
-                    LRUwins++;
-                    winner += ", LRU";
-                }
-                if(MRUresult[round] == min ) {
-                    MRUwins++;
-                    winner += ", MRU";
-                }
-                // System.out.println("Round: "+round+" FIFO: "+FIFOresult[round]+" LRU: "+LRUresult[round]+" MRU: "+MRUresult[round]+" winner: "+winner);
-
-                // Check for anomaly
-                if(round > 1 && FIFOresult[round] > FIFOresult[round-1]) FIFObelady.add(new BeladyAnomaly(FIFOresult[round-1], FIFOresult[round]));
-                if(round > 1 && LRUresult[round] > LRUresult[round-1]) LRUbelady.add(new BeladyAnomaly(LRUresult[round-1], LRUresult[round]));
-                if(round > 1 && MRUresult[round] > MRUresult[round-1]) MRUbelady.add(new BeladyAnomaly(MRUresult[round-1], MRUresult[round]));
+            if(LRUresult[round] == min ) {
+                LRUwins++;
+                winner += ", LRU";
             }
+            if(MRUresult[round] == min ) {
+                MRUwins++;
+                winner += ", MRU";
+            }
+            // System.out.println("Round: "+round+" FIFO: "+FIFOresult[round]+" LRU: "+LRUresult[round]+" MRU: "+MRUresult[round]+" winner: "+winner);
+
+            // Check for anomaly
+            if(round > 1 && FIFOresult[round] > FIFOresult[round-1]) FIFObelady.add(new BeladyAnomaly(FIFOresult[round-1], FIFOresult[round]));
+            if(round > 1 && LRUresult[round] > LRUresult[round-1]) LRUbelady.add(new BeladyAnomaly(LRUresult[round-1], LRUresult[round]));
+            if(round > 1 && MRUresult[round] > MRUresult[round-1]) MRUbelady.add(new BeladyAnomaly(MRUresult[round-1], MRUresult[round]));
         }
         System.out.println("FIFO min PF: "+FIFOwins);
         System.out.println("LRU min PF: "+LRUwins);
